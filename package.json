@@ -2,13 +2,16 @@
   "name": "vite-react-typescript-starter",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://Ceosar.github.io/inner",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.0",
