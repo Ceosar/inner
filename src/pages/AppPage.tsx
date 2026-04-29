@@ -41,7 +41,10 @@ export default function AppPage() {
 
   // Load messages for active conversation
   useEffect(() => {
-    if (!activeConvId) { setMessages([]); return; }
+    if (!activeConvId) {
+      setMessages([]);
+      return;
+    }
     setLoadingMessages(true);
     supabase
       .from('messages')
@@ -80,7 +83,7 @@ export default function AppPage() {
         updated_at: new Date().toISOString(),
       });
     },
-    [user]
+    [user],
   );
 
   const createConversation = async (mentorId: string): Promise<string> => {
@@ -93,7 +96,7 @@ export default function AppPage() {
       .single();
     if (data) {
       const conv = data as Conversation;
-      setConversations((prev) => [conv, ...prev]);
+      setConversations(prev => [conv, ...prev]);
       return conv.id;
     }
     return '';
@@ -105,15 +108,18 @@ export default function AppPage() {
   };
 
   const handleSelectConversation = (id: string) => {
-    const conv = conversations.find((c) => c.id === id);
+    const conv = conversations.find(c => c.id === id);
     if (conv) setActiveMentorId(conv.mentor_id);
     setActiveConvId(id);
   };
 
   const handleDeleteConversation = async (id: string) => {
     await supabase.from('conversations').delete().eq('id', id);
-    setConversations((prev) => prev.filter((c) => c.id !== id));
-    if (activeConvId === id) { setActiveConvId(null); setMessages([]); }
+    setConversations(prev => prev.filter(c => c.id !== id));
+    if (activeConvId === id) {
+      setActiveConvId(null);
+      setMessages([]);
+    }
   };
 
   const handleSelectMentor = (id: string) => {
@@ -145,7 +151,7 @@ export default function AppPage() {
       .single();
 
     const userMessage = insertedUser as Message;
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
 
     // Update conversation title from first message
     if (messages.length === 0) {
@@ -154,9 +160,7 @@ export default function AppPage() {
         .from('conversations')
         .update({ title, updated_at: new Date().toISOString() })
         .eq('id', convId);
-      setConversations((prev) =>
-        prev.map((c) => (c.id === convId ? { ...c, title } : c))
-      );
+      setConversations(prev => prev.map(c => (c.id === convId ? { ...c, title } : c)));
     } else {
       await supabase
         .from('conversations')
@@ -172,7 +176,7 @@ export default function AppPage() {
         activeMentorId,
         allMessages,
         customPrompts[activeMentorId] ?? '',
-        deepMode
+        deepMode,
       );
 
       const { data: insertedAI } = await supabase
@@ -181,7 +185,7 @@ export default function AppPage() {
         .select()
         .single();
 
-      if (insertedAI) setMessages((prev) => [...prev, insertedAI as Message]);
+      if (insertedAI) setMessages(prev => [...prev, insertedAI as Message]);
     } finally {
       setIsTyping(false);
     }
@@ -206,7 +210,6 @@ export default function AppPage() {
         background: `linear-gradient(160deg, #030a18 0%, #050d1e 60%, #04091a 100%)`,
       }}
     >
-      {/* Left sidebar */}
       <Sidebar
         conversations={conversations}
         activeConversationId={activeConvId}
@@ -217,10 +220,7 @@ export default function AppPage() {
         onSignOut={signOut}
         userEmail={user?.email ?? ''}
       />
-
-      {/* Center: chat */}
       <main className="flex flex-1 flex-col overflow-hidden">
-        {/* Chat header */}
         <div
           className="flex items-center justify-between border-b border-white/5 px-6 py-4"
           style={{
@@ -245,7 +245,6 @@ export default function AppPage() {
               </div>
             </div>
           </div>
-
           <button
             onClick={() => setShowSettings(true)}
             className="flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs font-medium text-white/50 transition-all hover:border-white/15 hover:text-white/80"
@@ -254,14 +253,12 @@ export default function AppPage() {
             Customize
           </button>
         </div>
-
         <ChatArea
           messages={messages}
           mentor={activeMentor}
           loading={loadingMessages}
           isTyping={isTyping}
         />
-
         <ChatInput
           onSend={handleSendMessage}
           disabled={isTyping}
@@ -271,15 +268,11 @@ export default function AppPage() {
           glowColor={activeMentor.glowColor}
         />
       </main>
-
-      {/* Right: mentors panel */}
       <MentorsPanel
         mentors={MENTORS}
         activeMentorId={activeMentorId}
         onSelectMentor={handleSelectMentor}
       />
-
-      {/* Mentor settings modal */}
       {showSettings && (
         <MentorSettingsPanel
           mentor={activeMentor}
