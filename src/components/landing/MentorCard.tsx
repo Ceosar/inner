@@ -41,9 +41,9 @@ export default function MentorCard({ mentor, onClick }: Props) {
           background: hovered
             ? `linear-gradient(135deg, rgba(10,20,40,0.95), rgba(15,25,50,0.95))`
             : 'rgba(10,15,30,0.6)',
-          borderColor: hovered ? mentor.glowColor + '50' : 'rgba(255,255,255,0.08)',
+          borderColor: hovered ? mentor.glow_color + '50' : 'rgba(255,255,255,0.08)',
           boxShadow: hovered
-            ? `0 0 30px ${mentor.glowColor}25, 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)`
+            ? `0 0 30px ${mentor.glow_color}25, 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)`
             : '0 4px 20px rgba(0,0,0,0.3)',
           backdropFilter: 'blur(10px)',
           transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
@@ -54,7 +54,7 @@ export default function MentorCard({ mentor, onClick }: Props) {
           <div
             className="pointer-events-none absolute inset-0 rounded-2xl opacity-20"
             style={{
-              background: `radial-gradient(circle at center, ${mentor.glowColor}, transparent 70%)`,
+              background: `radial-gradient(circle at center, ${mentor.glow_color}, transparent 70%)`,
             }}
           />
         )}
@@ -64,10 +64,10 @@ export default function MentorCard({ mentor, onClick }: Props) {
           className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl text-2xl transition-all duration-300"
           style={{
             background: hovered
-              ? `linear-gradient(135deg, ${mentor.glowColor}25, ${mentor.glowColor}10)`
+              ? `linear-gradient(135deg, ${mentor.glow_color}25, ${mentor.glow_color}10)`
               : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${hovered ? mentor.glowColor + '40' : 'rgba(255,255,255,0.08)'}`,
-            boxShadow: hovered ? `0 0 20px ${mentor.glowColor}30` : 'none',
+            border: `1px solid ${hovered ? mentor.glow_color + '40' : 'rgba(255,255,255,0.08)'}`,
+            boxShadow: hovered ? `0 0 20px ${mentor.glow_color}30` : 'none',
           }}
         >
           {mentor.icon}
@@ -80,16 +80,16 @@ export default function MentorCard({ mentor, onClick }: Props) {
         <div
           className="mb-3 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
           style={{
-            background: `${mentor.glowColor}15`,
-            color: mentor.glowColor,
-            border: `1px solid ${mentor.glowColor}30`,
+            background: `${mentor.glow_color}15`,
+            color: mentor.glow_color,
+            border: `1px solid ${mentor.glow_color}30`,
           }}
         >
           {mentor.tag}
         </div>
 
         {/* Short desc */}
-        <p className="text-sm leading-relaxed text-white/50">{mentor.shortDesc}</p>
+        <p className="text-sm leading-relaxed text-white/50">{mentor.short_desc}</p>
 
         {/* Expanded description on hover */}
         <div
@@ -97,19 +97,24 @@ export default function MentorCard({ mentor, onClick }: Props) {
           style={{ maxHeight: hovered ? '80px' : '0px', opacity: hovered ? 1 : 0 }}
         >
           <div className="mt-3 border-t border-white/10 pt-3">
-            <p className="text-xs leading-relaxed text-white/40">{mentor.fullDesc}</p>
+            <p className="text-xs leading-relaxed text-white/40">{mentor.full_desc}</p>
           </div>
         </div>
 
         {/* CTA hint on hover */}
         <div
           className="mt-3 flex items-center gap-1 transition-all duration-300"
-          style={{ opacity: hovered ? 1 : 0, transform: hovered ? 'translateY(0)' : 'translateY(4px)' }}
+          style={{
+            opacity: hovered ? 1 : 0,
+            transform: hovered ? 'translateY(0)' : 'translateY(4px)',
+          }}
         >
-          <span className="text-xs font-medium" style={{ color: mentor.glowColor }}>
+          <span className="text-xs font-medium" style={{ color: mentor.glow_color }}>
             Talk to {mentor.name.split(' ')[0]}
           </span>
-          <span className="text-xs" style={{ color: mentor.glowColor }}>→</span>
+          <span className="text-xs" style={{ color: mentor.glow_color }}>
+            →
+          </span>
         </div>
       </div>
     </div>

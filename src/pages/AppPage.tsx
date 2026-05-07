@@ -291,15 +291,15 @@ export default function AppPage() {
             <div
               className="flex h-9 w-9 items-center justify-center rounded-xl text-lg"
               style={{
-                background: `linear-gradient(135deg, ${activeMentor.glowColor}25, ${activeMentor.glowColor}10)`,
-                border: `1px solid ${activeMentor.glowColor}30`,
+                background: `linear-gradient(135deg, ${activeMentor.glow_color}25, ${activeMentor.glow_color}10)`,
+                border: `1px solid ${activeMentor.glow_color}30`,
               }}
             >
               {activeMentor.icon}
             </div>
             <div>
               <div className="text-sm font-semibold text-white">{activeMentor.name}</div>
-              <div className="text-xs" style={{ color: activeMentor.glowColor }}>
+              <div className="text-xs" style={{ color: activeMentor.glow_color }}>
                 {activeMentor.tag}
               </div>
             </div>
@@ -336,7 +336,7 @@ export default function AppPage() {
           mentorId={activeMentorId}
           deepMode={deepMode}
           onToggleDeepMode={handleToggleDeepMode}
-          glowColor={activeMentor.glowColor}
+          glowColor={activeMentor.glow_color}
         />
       </main>
       <MentorsPanel

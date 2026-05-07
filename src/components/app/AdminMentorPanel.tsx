@@ -8,10 +8,10 @@ const INITIAL_FORM: Mentor = {
   name: '',
   tag: '',
   icon: '🧠',
-  shortDesc: '',
-  fullDesc: '',
+  short_desc: '',
+  full_desc: '',
   gradient: 'from-cyan-900/40 to-blue-900/40',
-  glowColor: '#06b6d4',
+  glow_color: '#06b6d4',
   base_prompt: '',
 };
 
@@ -102,7 +102,10 @@ export default function AdminMentorPanel({
                 <div className="flex items-center gap-4">
                   <div
                     className="h-10 w-10 flex items-center justify-center rounded-lg text-xl"
-                    style={{ background: `${m.glowColor}15`, border: `1px solid ${m.glowColor}30` }}
+                    style={{
+                      background: `${m.glow_color}15`,
+                      border: `1px solid ${m.glow_color}30`,
+                    }}
                   >
                     {m.icon}
                   </div>

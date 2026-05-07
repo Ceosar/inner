@@ -3,10 +3,10 @@ export type Mentor = {
   name: string;
   tag: string;
   icon: string;
-  shortDesc: string;
-  fullDesc: string;
+  short_desc: string;
+  full_desc: string;
   gradient: string;
-  glowColor: string;
+  glow_color: string;
   base_prompt: string;
 };
 
