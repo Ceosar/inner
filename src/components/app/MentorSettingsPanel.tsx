@@ -38,7 +38,7 @@ export default function MentorSettingsPanel({
         className="relative w-full max-w-md rounded-2xl border border-white/10 p-6"
         style={{
           background: 'rgba(8,12,28,0.98)',
-          boxShadow: `0 0 60px ${mentor.glowColor}15, 0 25px 50px rgba(0,0,0,0.5)`,
+          boxShadow: `0 0 60px ${mentor.glow_color}15, 0 25px 50px rgba(0,0,0,0.5)`,
         }}
       >
         <button
@@ -53,8 +53,8 @@ export default function MentorSettingsPanel({
           <div
             className="flex h-10 w-10 items-center justify-center rounded-xl text-xl"
             style={{
-              background: `linear-gradient(135deg, ${mentor.glowColor}25, ${mentor.glowColor}10)`,
-              border: `1px solid ${mentor.glowColor}30`,
+              background: `linear-gradient(135deg, ${mentor.glow_color}25, ${mentor.glow_color}10)`,
+              border: `1px solid ${mentor.glow_color}30`,
             }}
           >
             {mentor.icon}
@@ -66,7 +66,7 @@ export default function MentorSettingsPanel({
         </div>
 
         {/* Base prompt preview */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="mb-1.5 block text-xs font-medium text-white/50">Base Personality</label>
           <div
             className="rounded-xl border border-white/6 px-3 py-2.5 text-xs leading-relaxed text-white/30"
@@ -74,7 +74,7 @@ export default function MentorSettingsPanel({
           >
             {mentor.base_prompt.slice(0, 120)}...
           </div>
-        </div>
+        </div> */}
 
         {/* Custom prompt */}
         <div className="mb-4">
@@ -91,7 +91,7 @@ export default function MentorSettingsPanel({
         </div>
 
         {/* Strict mode toggle */}
-        <div
+        {/* <div
           className="mb-6 flex items-center justify-between rounded-xl border border-white/8 px-3 py-3"
           style={{ background: 'rgba(255,255,255,0.03)' }}
         >
@@ -106,8 +106,8 @@ export default function MentorSettingsPanel({
             onClick={() => onStrictModeChange(!strictMode)}
             className="relative h-5 w-9 rounded-full transition-all"
             style={{
-              background: strictMode ? mentor.glowColor : 'rgba(255,255,255,0.15)',
-              boxShadow: strictMode ? `0 0 8px ${mentor.glowColor}50` : 'none',
+              background: strictMode ? mentor.glow_color : 'rgba(255,255,255,0.15)',
+              boxShadow: strictMode ? `0 0 8px ${mentor.glow_color}50` : 'none',
             }}
           >
             <div
@@ -115,7 +115,7 @@ export default function MentorSettingsPanel({
               style={{ left: strictMode ? 'calc(100% - 18px)' : '2px' }}
             />
           </button>
-        </div>
+        </div> */}
 
         {/* Actions */}
         <div className="flex gap-2">
@@ -134,7 +134,7 @@ export default function MentorSettingsPanel({
             onClick={handleSave}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
             style={{
-              background: `linear-gradient(135deg, ${mentor.glowColor}, ${mentor.glowColor}cc)`,
+              background: `linear-gradient(135deg, ${mentor.glow_color}, ${mentor.glow_color}cc)`,
             }}
           >
             Save
