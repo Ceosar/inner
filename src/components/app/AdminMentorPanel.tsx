@@ -153,6 +153,7 @@ export default function AdminMentorPanel({
               </div>
 
               <div className="space-y-5 flex-1">
+                {/* Name & Tag */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
@@ -176,12 +177,79 @@ export default function AdminMentorPanel({
                   </div>
                 </div>
 
+                {/* Icon */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
+                    Icon (emoji)
+                  </label>
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20"
+                    value={form.icon}
+                    onChange={e => setForm({ ...form, icon: e.target.value })}
+                    placeholder="🧠"
+                  />
+                </div>
+
+                {/* Short Description */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
+                    Short Description
+                  </label>
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20"
+                    value={form.short_desc}
+                    onChange={e => setForm({ ...form, short_desc: e.target.value })}
+                    placeholder="A one-line summary..."
+                  />
+                </div>
+
+                {/* Full Description */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
+                    Full Description
+                  </label>
+                  <textarea
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20 resize-none"
+                    rows={3}
+                    value={form.full_desc}
+                    onChange={e => setForm({ ...form, full_desc: e.target.value })}
+                    placeholder="Detailed description shown on landing..."
+                  />
+                </div>
+
+                {/* Gradient & Glow Color */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
+                      Gradient
+                    </label>
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20"
+                      value={form.gradient}
+                      onChange={e => setForm({ ...form, gradient: e.target.value })}
+                      placeholder="from-cyan-900/40 to-blue-900/40"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
+                      Glow Color
+                    </label>
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20"
+                      value={form.glow_color}
+                      onChange={e => setForm({ ...form, glow_color: e.target.value })}
+                      placeholder="#06b6d4"
+                    />
+                  </div>
+                </div>
+
+                {/* System Prompt */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-medium text-white/40 uppercase ml-1">
                     System Prompt
                   </label>
                   <textarea
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20 resize-none min-h-[300px]"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-white/20 resize-none min-h-[200px]"
                     value={form.base_prompt}
                     onChange={e => setForm({ ...form, base_prompt: e.target.value })}
                   />
