@@ -26,7 +26,6 @@ export default function MentorsPanel({ mentors, activeMentorId, onSelectMentor }
         {mentors.map(mentor => {
           const isActive = mentor.id === activeMentorId;
           const isExpanded = expanded === mentor.id;
-          console.log(mentor);
           return (
             <div key={mentor.id}>
               <div
