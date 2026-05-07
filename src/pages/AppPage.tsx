@@ -26,7 +26,7 @@ export default function AppPage() {
   const [strictMode, setStrictMode] = useState(false);
   const [role, setRole] = useState<'user' | 'admin'>('user');
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [loadingMentors, setLoadingMentors] = useState(true); // <-- новое состояние
+  const [loadingMentors, setLoadingMentors] = useState(true);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Загрузка менторов (один раз)
@@ -86,7 +86,6 @@ export default function AppPage() {
       });
   }, [activeConvId]);
 
-  // Load user settings
   useEffect(() => {
     if (!user) return;
     supabase
@@ -98,7 +97,7 @@ export default function AppPage() {
         if (data) {
           setCustomPrompts((data.custom_prompts as Record<string, string>) ?? {});
           setDeepMode(data.deep_mode ?? false);
-          setRole(data.role ?? 'user');
+          setRole(data.role);
         }
       });
   }, [user]);
