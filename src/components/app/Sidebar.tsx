@@ -15,6 +15,7 @@ type Props = {
 };
 
 export default function Sidebar({
+  mentors,
   conversations,
   activeConversationId,
   onNewChat,
@@ -66,13 +67,16 @@ export default function Sidebar({
         {conversations.length === 0 ? (
           <div className="px-2 py-8 text-center text-xs text-white/25">
             No conversations yet.
-            <br />Start a new chat above.
+            <br />
+            Start a new chat above.
           </div>
         ) : (
           <div className="space-y-0.5">
-            <div className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-white/25">Recent</div>
-            {conversations.map((conv) => {
-              const mentor = getMentorById(conv.mentor_id);
+            <div className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-white/25">
+              Recent
+            </div>
+            {conversations.map(conv => {
+              const mentor = getMentorById(mentors, conv.mentor_id);
               const isActive = conv.id === activeConversationId;
               return (
                 <div
@@ -93,7 +97,10 @@ export default function Sidebar({
                   </div>
                   {hoveredDel === conv.id && (
                     <button
-                      onClick={(e) => { e.stopPropagation(); onDeleteConversation(conv.id); }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        onDeleteConversation(conv.id);
+                      }}
                       className="shrink-0 rounded p-0.5 text-white/30 transition-colors hover:text-red-400"
                     >
                       <Trash2 size={12} />
@@ -115,9 +122,7 @@ export default function Sidebar({
           <Settings size={15} />
           Settings
         </button>
-        <div
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5"
-        >
+        <div className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5">
           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-400">
             {userEmail[0].toUpperCase()}
           </div>

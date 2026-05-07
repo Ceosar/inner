@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { Message } from './supabase';
-import { getMentorById } from './mentors';
+import { getMentorById, Mentor } from './mentors';
 
 const SUGGESTIONS: Record<string, string[]> = {
   psychologist: [
@@ -46,20 +46,21 @@ export function getSuggestions(mentorId: string): string[] {
 }
 
 export async function generateResponse(
+  mentors: Mentor[],
   mentorId: string,
   messages: Message[],
   customPrompt: string,
-  deepMode: boolean
+  deepMode: boolean,
 ): Promise<string> {
-  const mentor = getMentorById(mentorId);
-  const basePrompt = mentor.basePrompt;
+  const mentor = getMentorById(mentors, mentorId);
+  const basePrompt = mentor.base_prompt;
 
   const { data, error } = await supabase.functions.invoke('ai-chat', {
     body: {
       messages,
       systemPrompt: basePrompt,
       customPrompt,
-      deepMode, // ← передаётся только флаг, без текста
+      deepMode,
     },
   });
 

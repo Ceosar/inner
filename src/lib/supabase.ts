@@ -21,3 +21,12 @@ export type Message = {
   content: string;
   created_at: string;
 };
+
+export type UserSettings = {
+  id: string;
+  custom_prompts: Record<string, string>;
+  deep_mode: boolean;
+  role: 'user' | 'admin';
+  created_at: string;
+  updated_at: string;
+};

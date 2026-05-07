@@ -3,21 +3,38 @@ import { Check, Zap, Shield, Star } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
 import MentorCard from '../components/landing/MentorCard';
 import AuthModal from '../components/AuthModal';
-import { MENTORS } from '../lib/mentors';
+import { Mentor, MENTORS } from '../lib/mentors';
+import { supabase } from '../lib/supabase';
 
 export default function Landing() {
   const [showAuth, setShowAuth] = useState(false);
   const [authTab, setAuthTab] = useState<'login' | 'signup'>('signup');
   const [visible, setVisible] = useState(false);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  const openLogin = () => { setAuthTab('login'); setShowAuth(true); };
-  const openSignup = () => { setAuthTab('signup'); setShowAuth(true); };
+  useEffect(() => {
+    supabase
+      .from('mentors')
+      .select('*')
+      .order('name')
+      .then(({ data }) => {
+        if (data) setMentors(data as Mentor[]);
+      });
+  }, []);
 
+  const openLogin = () => {
+    setAuthTab('login');
+    setShowAuth(true);
+  };
+  const openSignup = () => {
+    setAuthTab('signup');
+    setShowAuth(true);
+  };
   return (
     <div
       className="min-h-screen overflow-x-hidden"
@@ -130,7 +147,7 @@ export default function Landing() {
             { value: '6', label: 'Expert Mentors', suffix: '' },
             { value: '24', label: 'Hour Availability', suffix: '/7' },
             { value: '100', label: 'Private & Secure', suffix: '%' },
-          ].map((stat) => (
+          ].map(stat => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl font-bold text-white">
                 {stat.value}
@@ -159,12 +176,13 @@ export default function Landing() {
               </span>
             </h2>
             <p className="text-white/50 max-w-md mx-auto">
-              Each mentor brings a unique perspective. Pick the one that resonates — or try them all.
+              Each mentor brings a unique perspective. Pick the one that resonates — or try them
+              all.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {MENTORS.map((mentor) => (
+            {mentors.map(mentor => (
               <MentorCard key={mentor.id} mentor={mentor} onClick={openSignup} />
             ))}
           </div>
@@ -183,17 +201,37 @@ export default function Landing() {
           >
             <p className="mb-6 text-2xl font-light leading-relaxed text-white/80 md:text-3xl">
               Stop overthinking. Stop searching endlessly.{' '}
-              <span className="font-semibold text-white">Talk, reflect, understand</span> — in one place.
+              <span className="font-semibold text-white">Talk, reflect, understand</span> — in one
+              place.
             </p>
 
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
               {[
-                { icon: <Zap size={20} />, title: 'Instant Clarity', desc: 'Get perspective on any situation within seconds, not days.' },
-                { icon: <Shield size={20} />, title: 'Completely Private', desc: 'Your conversations are encrypted and only visible to you.' },
-                { icon: <Star size={20} />, title: 'Always Available', desc: 'Your mentor is ready at 3am, on weekends, in any timezone.' },
-              ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-white/6 p-5" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl text-cyan-400" style={{ background: 'rgba(6,182,212,0.1)' }}>
+                {
+                  icon: <Zap size={20} />,
+                  title: 'Instant Clarity',
+                  desc: 'Get perspective on any situation within seconds, not days.',
+                },
+                {
+                  icon: <Shield size={20} />,
+                  title: 'Completely Private',
+                  desc: 'Your conversations are encrypted and only visible to you.',
+                },
+                {
+                  icon: <Star size={20} />,
+                  title: 'Always Available',
+                  desc: 'Your mentor is ready at 3am, on weekends, in any timezone.',
+                },
+              ].map(item => (
+                <div
+                  key={item.title}
+                  className="rounded-2xl border border-white/6 p-5"
+                  style={{ background: 'rgba(255,255,255,0.03)' }}
+                >
+                  <div
+                    className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl text-cyan-400"
+                    style={{ background: 'rgba(6,182,212,0.1)' }}
+                  >
                     {item.icon}
                   </div>
                   <h3 className="mb-1 text-sm font-semibold text-white">{item.title}</h3>
@@ -219,11 +257,13 @@ export default function Landing() {
               className="rounded-3xl border border-white/8 p-8"
               style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)' }}
             >
-              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Free</div>
+              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">
+                Free
+              </div>
               <div className="mb-1 text-4xl font-bold text-white">$0</div>
               <div className="mb-6 text-sm text-white/40">forever</div>
               <ul className="space-y-3">
-                {['10 messages per day', 'Access to 2 mentors', 'Basic chat history'].map((f) => (
+                {['10 messages per day', 'Access to 2 mentors', 'Basic chat history'].map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-white/60">
                     <Check size={15} className="shrink-0 text-cyan-400" />
                     {f}
@@ -254,7 +294,9 @@ export default function Landing() {
               >
                 Most Popular
               </div>
-              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-cyan-400">Premium</div>
+              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-cyan-400">
+                Premium
+              </div>
               <div className="mb-1 text-4xl font-bold text-white">$1</div>
               <div className="mb-6 text-sm text-white/40">for 7 days, then $12/mo</div>
               <ul className="space-y-3">
@@ -265,7 +307,7 @@ export default function Landing() {
                   'Custom mentor prompts',
                   'Full chat history',
                   'Priority responses',
-                ].map((f) => (
+                ].map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-white/70">
                     <Check size={15} className="shrink-0 text-cyan-400" />
                     {f}

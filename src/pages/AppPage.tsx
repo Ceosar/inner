@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { Shield, SlidersHorizontal } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Conversation, Message } from '../lib/supabase';
-import { MENTORS, getMentorById } from '../lib/mentors';
+import { Mentor, getMentorById } from '../lib/mentors';
 import { generateResponse } from '../lib/ai';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/app/Sidebar';
@@ -10,6 +10,7 @@ import MentorsPanel from '../components/app/MentorsPanel';
 import ChatArea from '../components/app/ChatArea';
 import ChatInput from '../components/app/ChatInput';
 import MentorSettingsPanel from '../components/app/MentorSettingsPanel';
+import AdminMentorPanel from '../components/app/AdminMentorPanel';
 
 export default function AppPage() {
   const { user, signOut } = useAuth();
@@ -23,8 +24,36 @@ export default function AppPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [customPrompts, setCustomPrompts] = useState<Record<string, string>>({});
   const [strictMode, setStrictMode] = useState(false);
+  const [role, setRole] = useState<'user' | 'admin'>('user');
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loadingMentors, setLoadingMentors] = useState(true); // <-- новое состояние
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
-  const activeMentor = getMentorById(activeMentorId);
+  // Загрузка менторов (один раз)
+  useEffect(() => {
+    if (!user) {
+      setLoadingMentors(false);
+      return;
+    }
+    supabase
+      .from('mentors')
+      .select('*')
+      .order('name')
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setMentors(data as Mentor[]);
+          // Если текущий выбранный ментор отсутствует в загруженных, переключимся на первого
+          if (!data.find((m: any) => m.id === activeMentorId)) {
+            setActiveMentorId(data[0].id);
+          }
+        }
+        setLoadingMentors(false);
+      })
+      .catch(() => setLoadingMentors(false));
+  }, [user]);
+
+  // Вычисляем текущего ментора (может быть undefined при загрузке)
+  const activeMentor = mentors.length > 0 ? getMentorById(mentors, activeMentorId) : null;
 
   // Load conversations
   useEffect(() => {
@@ -69,6 +98,7 @@ export default function AppPage() {
         if (data) {
           setCustomPrompts((data.custom_prompts as Record<string, string>) ?? {});
           setDeepMode(data.deep_mode ?? false);
+          setRole(data.role ?? 'user');
         }
       });
   }, [user]);
@@ -87,8 +117,8 @@ export default function AppPage() {
   );
 
   const createConversation = async (mentorId: string): Promise<string> => {
-    if (!user) return '';
-    const mentor = getMentorById(mentorId);
+    if (!user || !activeMentor) return '';
+    const mentor = getMentorById(mentors, mentorId);
     const { data } = await supabase
       .from('conversations')
       .insert({ user_id: user.id, mentor_id: mentorId, title: `Chat with ${mentor.name}` })
@@ -129,7 +159,7 @@ export default function AppPage() {
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!user) return;
+    if (!user || !activeMentor) return;
 
     let convId = activeConvId;
     if (!convId) {
@@ -173,6 +203,7 @@ export default function AppPage() {
     try {
       const allMessages = [...messages, userMessage];
       const responseText = await generateResponse(
+        mentors,
         activeMentorId,
         allMessages,
         customPrompts[activeMentorId] ?? '',
@@ -203,6 +234,34 @@ export default function AppPage() {
     await saveSettings(customPrompts, next);
   };
 
+  const handleMentorsUpdated = () => {
+    supabase
+      .from('mentors')
+      .select('*')
+      .order('name')
+      .then(({ data }) => {
+        if (data) setMentors(data as Mentor[]);
+      });
+  };
+
+  // Показываем загрузку, если менторы ещё не получены
+  if (loadingMentors) {
+    return (
+      <div className="flex h-screen items-center justify-center" style={{ background: '#030a18' }}>
+        <div className="text-cyan-400 animate-pulse">Loading mentors...</div>
+      </div>
+    );
+  }
+
+  // Если менторы не загрузились (пустой массив)
+  if (!activeMentor) {
+    return (
+      <div className="flex h-screen items-center justify-center" style={{ background: '#030a18' }}>
+        <div className="text-red-400">No mentors available. Please contact admin.</div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="flex h-screen overflow-hidden"
@@ -211,6 +270,7 @@ export default function AppPage() {
       }}
     >
       <Sidebar
+        mentors={mentors}
         conversations={conversations}
         activeConversationId={activeConvId}
         onNewChat={handleNewChat}
@@ -245,13 +305,25 @@ export default function AppPage() {
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs font-medium text-white/50 transition-all hover:border-white/15 hover:text-white/80"
-          >
-            <SlidersHorizontal size={13} />
-            Customize
-          </button>
+          <div className="flex items-center gap-2">
+            {role === 'admin' && (
+              <button
+                onClick={() => setShowAdminPanel(true)}
+                className="flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-400 transition-all hover:bg-cyan-500/20"
+              >
+                <Shield size={13} />
+                Manage Mentors
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowSettings(true)}
+              className="flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs font-medium text-white/50 transition-all hover:border-white/15 hover:text-white/80"
+            >
+              <SlidersHorizontal size={13} />
+              Customize
+            </button>
+          </div>
         </div>
         <ChatArea
           messages={messages}
@@ -269,11 +341,11 @@ export default function AppPage() {
         />
       </main>
       <MentorsPanel
-        mentors={MENTORS}
+        mentors={mentors}
         activeMentorId={activeMentorId}
         onSelectMentor={handleSelectMentor}
       />
-      {showSettings && (
+      {showSettings && activeMentor && (
         <MentorSettingsPanel
           mentor={activeMentor}
           customPrompt={customPrompts[activeMentorId] ?? ''}
@@ -282,6 +354,13 @@ export default function AppPage() {
           onStrictModeChange={setStrictMode}
           onReset={() => handleCustomPromptChange('')}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+      {showAdminPanel && (
+        <AdminMentorPanel
+          mentors={mentors}
+          onUpdated={handleMentorsUpdated}
+          onClose={() => setShowAdminPanel(false)}
         />
       )}
     </div>

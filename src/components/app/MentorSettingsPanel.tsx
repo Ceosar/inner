@@ -32,7 +32,7 @@ export default function MentorSettingsPanel({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
         className="relative w-full max-w-md rounded-2xl border border-white/10 p-6"
@@ -41,7 +41,10 @@ export default function MentorSettingsPanel({
           boxShadow: `0 0 60px ${mentor.glowColor}15, 0 25px 50px rgba(0,0,0,0.5)`,
         }}
       >
-        <button onClick={onClose} className="absolute right-4 top-4 text-white/40 hover:text-white/70">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-white/40 hover:text-white/70"
+        >
           <X size={18} />
         </button>
 
@@ -69,7 +72,7 @@ export default function MentorSettingsPanel({
             className="rounded-xl border border-white/6 px-3 py-2.5 text-xs leading-relaxed text-white/30"
             style={{ background: 'rgba(255,255,255,0.02)' }}
           >
-            {mentor.basePrompt.slice(0, 120)}...
+            {mentor.base_prompt.slice(0, 120)}...
           </div>
         </div>
 
@@ -80,7 +83,7 @@ export default function MentorSettingsPanel({
           </label>
           <textarea
             value={localPrompt}
-            onChange={(e) => setLocalPrompt(e.target.value)}
+            onChange={e => setLocalPrompt(e.target.value)}
             placeholder={`e.g. "Focus on practical advice. Keep responses short. Challenge me more."`}
             rows={4}
             className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white placeholder-white/25 outline-none transition-all focus:border-white/20"
@@ -88,7 +91,10 @@ export default function MentorSettingsPanel({
         </div>
 
         {/* Strict mode toggle */}
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-white/8 px-3 py-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+        <div
+          className="mb-6 flex items-center justify-between rounded-xl border border-white/8 px-3 py-3"
+          style={{ background: 'rgba(255,255,255,0.03)' }}
+        >
           <div className="flex items-center gap-2">
             <Shield size={14} className="text-white/40" />
             <div>
@@ -114,7 +120,11 @@ export default function MentorSettingsPanel({
         {/* Actions */}
         <div className="flex gap-2">
           <button
-            onClick={() => { onReset(); setLocalPrompt(''); onClose(); }}
+            onClick={() => {
+              onReset();
+              setLocalPrompt('');
+              onClose();
+            }}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 py-2.5 text-xs font-medium text-white/50 transition-colors hover:border-white/20 hover:text-white/70"
           >
             <RotateCcw size={12} />
@@ -123,7 +133,9 @@ export default function MentorSettingsPanel({
           <button
             onClick={handleSave}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
-            style={{ background: `linear-gradient(135deg, ${mentor.glowColor}, ${mentor.glowColor}cc)` }}
+            style={{
+              background: `linear-gradient(135deg, ${mentor.glowColor}, ${mentor.glowColor}cc)`,
+            }}
           >
             Save
           </button>
