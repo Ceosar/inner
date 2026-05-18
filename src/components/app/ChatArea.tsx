@@ -31,20 +31,16 @@ export default function ChatArea({ messages, mentor, loading, isTyping }: Props)
         <div
           className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
           style={{
-            background: `linear-gradient(135deg, ${mentor.glowColor}25, ${mentor.glowColor}10)`,
-            border: `1px solid ${mentor.glowColor}30`,
-            boxShadow: `0 0 30px ${mentor.glowColor}20`,
+            background: `linear-gradient(135deg, ${mentor.glow_color}25, ${mentor.glow_color}10)`,
+            border: `1px solid ${mentor.glow_color}30`,
+            boxShadow: `0 0 30px ${mentor.glow_color}20`,
           }}
         >
           {mentor.icon}
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-white">
-          {mentor.name}
-        </h3>
-        <p className="text-sm text-white/40 max-w-xs">{mentor.fullDesc}</p>
-        <p className="mt-4 text-xs text-white/25">
-          What's on your mind? I'm here to listen.
-        </p>
+        <h3 className="mb-2 text-lg font-semibold text-white">{mentor.name}</h3>
+        <p className="text-sm text-white/40 max-w-xs">{mentor.full_desc}</p>
+        <p className="mt-4 text-xs text-white/25">What's on your mind? I'm here to listen.</p>
       </div>
     );
   }
@@ -61,8 +57,8 @@ export default function ChatArea({ messages, mentor, loading, isTyping }: Props)
             <div
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm"
               style={{
-                background: `linear-gradient(135deg, ${mentor.glowColor}25, ${mentor.glowColor}10)`,
-                border: `1px solid ${mentor.glowColor}25`,
+                background: `linear-gradient(135deg, ${mentor.glow_color}25, ${mentor.glow_color}10)`,
+                border: `1px solid ${mentor.glow_color}25`,
               }}
             >
               {mentor.icon}
@@ -108,16 +104,16 @@ function MessageBubble({ message, mentor }: { message: Message; mentor: Mentor }
       <div
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm"
         style={{
-          background: `linear-gradient(135deg, ${mentor.glowColor}25, ${mentor.glowColor}10)`,
-          border: `1px solid ${mentor.glowColor}25`,
+          background: `linear-gradient(135deg, ${mentor.glow_color}25, ${mentor.glow_color}10)`,
+          border: `1px solid ${mentor.glow_color}25`,
         }}
       >
         {mentor.icon}
       </div>
       <div className="max-w-2xl">
-        <div className="mb-1 text-xs font-medium" style={{ color: mentor.glowColor }}>
+        {/* <div className="mb-1 text-xs font-medium" style={{ color: mentor.glow_color }}>
           {mentor.name}
-        </div>
+        </div> */}
         <div
           className="rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed text-white/85"
           style={{
@@ -140,7 +136,7 @@ function MessageBubble({ message, mentor }: { message: Message; mentor: Mentor }
 function TypingIndicator() {
   return (
     <div className="flex items-center gap-1 py-0.5">
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2].map(i => (
         <div
           key={i}
           className="h-2 w-2 rounded-full bg-white/40"

@@ -18,7 +18,7 @@ export default function MentorsPanel({ mentors, activeMentorId, onSelectMentor }
         backdropFilter: 'blur(20px)',
       }}
     >
-      <div className="border-b border-white/5 px-4 py-5">
+      <div className="border-b border-white/5 px-5 py-6">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-white/30">Mentors</h2>
       </div>
 
