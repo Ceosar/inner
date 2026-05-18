@@ -7,6 +7,15 @@ type Props = {
   defaultTab?: 'login' | 'signup';
 };
 
+const isValidEmail = (email: string): boolean => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
+const isValidPassword = (password: string): boolean => {
+  return password.length >= 8 && /[a-z]/.test(password);
+};
+
 export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
   const [tab, setTab] = useState<'login' | 'signup'>(defaultTab);
   const [email, setEmail] = useState('');
@@ -14,17 +23,66 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { signIn, signUp } = useAuth();
+
+  const handleTabChange = (t: 'login' | 'signup') => {
+    setTab(t);
+    setError('');
+    setEmailError('');
+    setPasswordError('');
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (!value) {
+      setEmailError('Email is required');
+    } else if (!isValidEmail(value)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (!value) {
+      setPasswordError('Password is required');
+    } else if (value.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+    } else if (!/[a-z]/.test(value)) {
+      setPasswordError('Password must contain at least one lowercase letter');
+    } else {
+      setPasswordError('');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    let hasError = false;
+    if (!isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+    if (!isValidPassword(password)) {
+      if (password.length < 8) {
+        setPasswordError('Password must be at least 8 characters');
+      } else if (!/[a-z]/.test(password)) {
+        setPasswordError('Password must contain at least one lowercase letter');
+      }
+      hasError = true;
+    }
+    if (hasError) return;
+
     setLoading(true);
     const fn = tab === 'login' ? signIn : signUp;
-    const { error } = await fn(email, password);
+    const { error: authError } = await fn(email, password);
     setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (authError) {
+      setError(authError.message);
     } else {
       onClose();
     }
@@ -34,10 +92,10 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="relative w-full max-w-md rounded-2xl border border-white/10 p-8"
+        className="relative w-full max-w-md rounded-2xl border border-white/10 p-6 sm:p-8"
         style={{
           background: 'linear-gradient(135deg, rgba(10,15,30,0.97) 0%, rgba(15,20,40,0.97) 100%)',
           boxShadow: '0 0 60px rgba(6,182,212,0.15), 0 25px 50px rgba(0,0,0,0.5)',
@@ -62,16 +120,21 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
             {tab === 'login' ? 'Welcome back' : 'Create your account'}
           </h2>
           <p className="mt-1 text-sm text-white/50">
-            {tab === 'login' ? 'Sign in to continue your journey' : 'Start your inner journey today'}
+            {tab === 'login'
+              ? 'Sign in to continue your journey'
+              : 'Start your inner journey today'}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex rounded-xl border border-white/10 p-1" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          {(['login', 'signup'] as const).map((t) => (
+        <div
+          className="mb-6 flex rounded-xl border border-white/10 p-1"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
+          {(['login', 'signup'] as const).map(t => (
             <button
               key={t}
-              onClick={() => { setTab(t); setError(''); }}
+              onClick={() => handleTabChange(t)}
               className="flex-1 rounded-lg py-2 text-sm font-medium transition-all"
               style={{
                 background: tab === t ? 'rgba(6,182,212,0.2)' : 'transparent',
@@ -92,12 +155,17 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => handleEmailChange(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-9 pr-4 text-sm text-white placeholder-white/30 outline-none transition-all focus:border-cyan-500/50 focus:bg-white/8"
+                className={`w-full rounded-xl border bg-white/5 py-3 pl-9 pr-4 text-sm text-white placeholder-white/30 outline-none transition-all focus:bg-white/8 ${
+                  emailError
+                    ? 'border-red-500/50 focus:border-red-500'
+                    : 'border-white/10 focus:border-cyan-500/50'
+                }`}
               />
             </div>
+            {emailError && <p className="mt-1 text-xs text-red-400">{emailError}</p>}
           </div>
 
           <div>
@@ -107,11 +175,15 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => handlePasswordChange(e.target.value)}
                 placeholder="••••••••"
                 required
-                minLength={6}
-                className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-9 pr-10 text-sm text-white placeholder-white/30 outline-none transition-all focus:border-cyan-500/50 focus:bg-white/8"
+                minLength={8}
+                className={`w-full rounded-xl border bg-white/5 py-3 pl-9 pr-10 text-sm text-white placeholder-white/30 outline-none transition-all focus:bg-white/8 ${
+                  passwordError
+                    ? 'border-red-500/50 focus:border-red-500'
+                    : 'border-white/10 focus:border-cyan-500/50'
+                }`}
               />
               <button
                 type="button"
@@ -121,6 +193,7 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+            {passwordError && <p className="mt-1 text-xs text-red-400">{passwordError}</p>}
           </div>
 
           {error && (
@@ -131,7 +204,7 @@ export default function AuthModal({ onClose, defaultTab = 'login' }: Props) {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !!emailError || !!passwordError}
             className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-98 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
           >
