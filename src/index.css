@@ -6,9 +6,12 @@
 
 * {
   box-sizing: border-box;
+  border-color: rgb(4, 10, 26);
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -39,7 +42,11 @@ html, body, #root {
   transition-property: none;
 }
 
-button, a, input, textarea, [class*="transition"] {
+button,
+a,
+input,
+textarea,
+[class*="transition"] {
   transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
   transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   transition-duration: 200ms;
