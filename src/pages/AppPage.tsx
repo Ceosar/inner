@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, SlidersHorizontal } from 'lucide-react';
+import { Shield, SlidersHorizontal, Menu, Users, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Conversation, Message } from '../lib/supabase';
 import { Mentor, getMentorById } from '../lib/mentors';
@@ -29,7 +29,9 @@ export default function AppPage() {
   const [loadingMentors, setLoadingMentors] = useState(true);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
-  // Загрузка менторов (один раз)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileMentorsOpen, setMobileMentorsOpen] = useState(false);
+
   useEffect(() => {
     if (!user) {
       setLoadingMentors(false);
@@ -42,7 +44,6 @@ export default function AppPage() {
       .then(({ data }) => {
         if (data && data.length > 0) {
           setMentors(data as Mentor[]);
-          // Если текущий выбранный ментор отсутствует в загруженных, переключимся на первого
           if (!data.find((m: any) => m.id === activeMentorId)) {
             setActiveMentorId(data[0].id);
           }
@@ -52,10 +53,8 @@ export default function AppPage() {
       .catch(() => setLoadingMentors(false));
   }, [user]);
 
-  // Вычисляем текущего ментора (может быть undefined при загрузке)
   const activeMentor = mentors.length > 0 ? getMentorById(mentors, activeMentorId) : null;
 
-  // Load conversations
   useEffect(() => {
     if (!user) return;
     supabase
@@ -68,7 +67,6 @@ export default function AppPage() {
       });
   }, [user]);
 
-  // Load messages for active conversation
   useEffect(() => {
     if (!activeConvId) {
       setMessages([]);
@@ -167,7 +165,6 @@ export default function AppPage() {
       setActiveConvId(convId);
     }
 
-    // Insert user message
     const userMsg: Omit<Message, 'id' | 'created_at'> = {
       conversation_id: convId,
       role: 'user',
@@ -182,7 +179,6 @@ export default function AppPage() {
     const userMessage = insertedUser as Message;
     setMessages(prev => [...prev, userMessage]);
 
-    // Update conversation title from first message
     if (messages.length === 0) {
       const title = content.length > 50 ? content.slice(0, 50) + '...' : content;
       await supabase
@@ -197,7 +193,6 @@ export default function AppPage() {
         .eq('id', convId);
     }
 
-    // Generate AI response
     setIsTyping(true);
     try {
       const allMessages = [...messages, userMessage];
@@ -243,7 +238,6 @@ export default function AppPage() {
       });
   };
 
-  // Показываем загрузку, если менторы ещё не получены
   if (loadingMentors) {
     return (
       <div className="flex h-screen items-center justify-center" style={{ background: '#030a18' }}>
@@ -252,7 +246,6 @@ export default function AppPage() {
     );
   }
 
-  // Если менторы не загрузились (пустой массив)
   if (!activeMentor) {
     return (
       <div className="flex h-screen items-center justify-center" style={{ background: '#030a18' }}>
@@ -268,39 +261,78 @@ export default function AppPage() {
         background: `linear-gradient(160deg, #030a18 0%, #050d1e 60%, #04091a 100%)`,
       }}
     >
-      <Sidebar
-        mentors={mentors}
-        conversations={conversations}
-        activeConversationId={activeConvId}
-        onNewChat={handleNewChat}
-        onSelectConversation={handleSelectConversation}
-        onDeleteConversation={handleDeleteConversation}
-        onSettings={() => setShowSettings(true)}
-        onSignOut={signOut}
-        userEmail={user?.email ?? ''}
-      />
+      <div className="hidden md:block">
+        <Sidebar
+          mentors={mentors}
+          conversations={conversations}
+          activeConversationId={activeConvId}
+          onNewChat={handleNewChat}
+          onSelectConversation={handleSelectConversation}
+          onDeleteConversation={handleDeleteConversation}
+          onSettings={() => setShowSettings(true)}
+          onSignOut={signOut}
+          userEmail={user?.email ?? ''}
+        />
+      </div>
+
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="absolute left-0 top-0 h-full w-72">
+            <Sidebar
+              mentors={mentors}
+              conversations={conversations}
+              activeConversationId={activeConvId}
+              onNewChat={handleNewChat}
+              onSelectConversation={id => {
+                handleSelectConversation(id);
+                setMobileSidebarOpen(false);
+              }}
+              onDeleteConversation={handleDeleteConversation}
+              onSettings={() => {
+                setShowSettings(true);
+                setMobileSidebarOpen(false);
+              }}
+              onSignOut={signOut}
+              userEmail={user?.email ?? ''}
+              onClose={() => setMobileSidebarOpen(false)}
+            />
+          </div>
+        </div>
+      )}
       <main className="flex flex-1 flex-col overflow-hidden">
         <div
-          className="flex items-center justify-between border-b border-white/5 px-6 py-4"
+          className="flex items-center justify-between border-b border-white/5 px-4 py-3 md:px-6 md:py-4"
           style={{
             background: 'rgba(5,10,22,0.8)',
             backdropFilter: 'blur(10px)',
           }}
         >
           <div className="flex items-center gap-3">
-            <div
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-lg"
-              style={{
-                background: `linear-gradient(135deg, ${activeMentor.glow_color}25, ${activeMentor.glow_color}10)`,
-                border: `1px solid ${activeMentor.glow_color}30`,
-              }}
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="md:hidden text-white/60 hover:text-white"
             >
-              {activeMentor.icon}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-white">{activeMentor.name}</div>
-              <div className="text-xs" style={{ color: activeMentor.glow_color }}>
-                {activeMentor.tag}
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-xl text-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${activeMentor.glow_color}25, ${activeMentor.glow_color}10)`,
+                  border: `1px solid ${activeMentor.glow_color}30`,
+                }}
+              >
+                {activeMentor.icon}
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white">{activeMentor.name}</div>
+                <div className="text-xs" style={{ color: activeMentor.glow_color }}>
+                  {activeMentor.tag}
+                </div>
               </div>
             </div>
           </div>
@@ -311,16 +343,21 @@ export default function AppPage() {
                 className="flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-400 transition-all hover:bg-cyan-500/20"
               >
                 <Shield size={13} />
-                Manage Mentors
+                <span className="hidden sm:inline">Manage Mentors</span>
               </button>
             )}
-
             <button
               onClick={() => setShowSettings(true)}
               className="flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs font-medium text-white/50 transition-all hover:border-white/15 hover:text-white/80"
             >
               <SlidersHorizontal size={13} />
-              Customize
+              <span className="hidden sm:inline">Customize</span>
+            </button>
+            <button
+              onClick={() => setMobileMentorsOpen(true)}
+              className="md:hidden text-white/60 hover:text-white"
+            >
+              <Users size={20} />
             </button>
           </div>
         </div>
@@ -339,11 +376,32 @@ export default function AppPage() {
           glowColor={activeMentor.glow_color}
         />
       </main>
-      <MentorsPanel
-        mentors={mentors}
-        activeMentorId={activeMentorId}
-        onSelectMentor={handleSelectMentor}
-      />
+      <div className="hidden md:block">
+        <MentorsPanel
+          mentors={mentors}
+          activeMentorId={activeMentorId}
+          onSelectMentor={handleSelectMentor}
+        />
+      </div>
+      {mobileMentorsOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileMentorsOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-56">
+            <MentorsPanel
+              mentors={mentors}
+              activeMentorId={activeMentorId}
+              onSelectMentor={id => {
+                handleSelectMentor(id);
+                setMobileMentorsOpen(false);
+              }}
+              onClose={() => setMobileMentorsOpen(false)}
+            />
+          </div>
+        </div>
+      )}
       {showSettings && activeMentor && (
         <MentorSettingsPanel
           mentor={activeMentor}

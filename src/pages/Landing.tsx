@@ -3,7 +3,7 @@ import { Check, Zap, Shield, Star } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
 import MentorCard from '../components/landing/MentorCard';
 import AuthModal from '../components/AuthModal';
-import { Mentor, MENTORS } from '../lib/mentors';
+import { Mentor } from '../lib/mentors';
 import { supabase } from '../lib/supabase';
 
 export default function Landing() {
@@ -35,6 +35,7 @@ export default function Landing() {
     setAuthTab('signup');
     setShowAuth(true);
   };
+
   return (
     <div
       className="min-h-screen overflow-x-hidden"
@@ -43,7 +44,6 @@ export default function Landing() {
         color: 'white',
       }}
     >
-      {/* Background ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
           className="absolute -left-40 top-1/4 h-96 w-96 rounded-full opacity-20 blur-3xl"
@@ -60,12 +60,9 @@ export default function Landing() {
       </div>
 
       <Navbar onLogin={openLogin} onGetStarted={openSignup} />
-
-      {/* HERO */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-20 text-center">
-        {/* Badge */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center px-4 pt-20 text-center md:px-6">
         <div
-          className="mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium transition-all"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all md:mb-8 md:px-4"
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(20px)',
@@ -78,10 +75,8 @@ export default function Landing() {
           <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
           AI-powered self-reflection · Available 24/7
         </div>
-
-        {/* Headline */}
         <h1
-          className="mb-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl"
+          className="mb-6 max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl"
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(30px)',
@@ -99,10 +94,8 @@ export default function Landing() {
             The answer is already inside you.
           </span>
         </h1>
-
-        {/* Subtext */}
         <p
-          className="mb-10 max-w-xl text-lg text-white/60 leading-relaxed"
+          className="mb-8 max-w-xl text-base text-white/60 leading-relaxed md:text-lg"
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(30px)',
@@ -111,8 +104,6 @@ export default function Landing() {
         >
           AI mentors help you see your situation clearly — without noise, without endless searching.
         </p>
-
-        {/* CTA */}
         <div
           className="flex flex-col items-center gap-4 sm:flex-row"
           style={{
@@ -123,7 +114,7 @@ export default function Landing() {
         >
           <button
             onClick={openSignup}
-            className="group relative rounded-2xl px-8 py-4 text-base font-semibold text-white transition-all hover:scale-105 active:scale-95"
+            className="group relative rounded-2xl px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95 md:px-8 md:py-4 md:text-base"
             style={{
               background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
               boxShadow: '0 0 40px rgba(6,182,212,0.35), 0 8px 20px rgba(0,0,0,0.3)',
@@ -134,10 +125,8 @@ export default function Landing() {
           </button>
           <p className="text-xs text-white/30">No credit card required</p>
         </div>
-
-        {/* Stats */}
         <div
-          className="mt-16 flex flex-wrap justify-center gap-8 border-t border-white/5 pt-16"
+          className="mt-12 flex flex-wrap justify-center gap-6 border-t border-white/5 pt-12 md:mt-16 md:gap-8 md:pt-16"
           style={{
             opacity: visible ? 1 : 0,
             transition: 'all 0.8s ease 0.5s',
@@ -149,21 +138,19 @@ export default function Landing() {
             { value: '100', label: 'Private & Secure', suffix: '%' },
           ].map(stat => (
             <div key={stat.label} className="text-center">
-              <div className="text-3xl font-bold text-white">
+              <div className="text-2xl font-bold text-white md:text-3xl">
                 {stat.value}
                 <span className="text-cyan-400">{stat.suffix}</span>
               </div>
-              <div className="mt-1 text-xs text-white/40">{stat.label}</div>
+              <div className="mt-1 text-xs text-white/40 md:text-xs">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
-
-      {/* MENTORS SHOWCASE */}
-      <section id="mentors" className="relative px-6 py-24">
+      <section id="mentors" className="relative px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+          <div className="mb-10 text-center md:mb-16">
+            <h2 className="mb-4 text-2xl font-bold text-white md:text-4xl">
               Choose your{' '}
               <span
                 style={{
@@ -175,7 +162,7 @@ export default function Landing() {
                 guide
               </span>
             </h2>
-            <p className="text-white/50 max-w-md mx-auto">
+            <p className="text-white/50 max-w-md mx-auto text-sm md:text-base">
               Each mentor brings a unique perspective. Pick the one that resonates — or try them
               all.
             </p>
@@ -188,18 +175,16 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
-      {/* VALUE BLOCK */}
-      <section id="about" className="relative px-6 py-24">
+      <section id="about" className="relative px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-4xl text-center">
           <div
-            className="rounded-3xl border border-white/8 p-12"
+            className="rounded-3xl border border-white/8 p-8 md:p-12"
             style={{
               background: 'linear-gradient(135deg, rgba(6,182,212,0.06), rgba(245,158,11,0.04))',
               backdropFilter: 'blur(20px)',
             }}
           >
-            <p className="mb-6 text-2xl font-light leading-relaxed text-white/80 md:text-3xl">
+            <p className="mb-6 text-xl font-light leading-relaxed text-white/80 md:text-3xl">
               Stop overthinking. Stop searching endlessly.{' '}
               <span className="font-semibold text-white">Talk, reflect, understand</span> — in one
               place.
@@ -225,7 +210,7 @@ export default function Landing() {
               ].map(item => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-white/6 p-5"
+                  className="rounded-2xl border border-white/6 p-5 text-left sm:text-center"
                   style={{ background: 'rgba(255,255,255,0.03)' }}
                 >
                   <div
@@ -242,25 +227,23 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
-      {/* PRICING */}
-      <section id="pricing" className="relative px-6 py-24">
+      <section id="pricing" className="relative px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Simple pricing</h2>
-            <p className="text-white/50">Start free. Go deeper when you're ready.</p>
+          <div className="mb-10 text-center md:mb-16">
+            <h2 className="mb-4 text-2xl font-bold text-white md:text-4xl">Simple pricing</h2>
+            <p className="text-white/50 text-sm md:text-base">
+              Start free. Go deeper when you're ready.
+            </p>
           </div>
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Free */}
             <div
-              className="rounded-3xl border border-white/8 p-8"
+              className="rounded-3xl border border-white/8 p-6 md:p-8"
               style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)' }}
             >
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">
                 Free
               </div>
-              <div className="mb-1 text-4xl font-bold text-white">$0</div>
+              <div className="mb-1 text-3xl font-bold text-white md:text-4xl">$0</div>
               <div className="mb-6 text-sm text-white/40">forever</div>
               <ul className="space-y-3">
                 {['10 messages per day', 'Access to 2 mentors', 'Basic chat history'].map(f => (
@@ -277,10 +260,8 @@ export default function Landing() {
                 Get started free
               </button>
             </div>
-
-            {/* Premium */}
             <div
-              className="relative rounded-3xl border p-8"
+              className="relative rounded-3xl border p-6 md:p-8"
               style={{
                 background: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(8,145,178,0.06))',
                 borderColor: 'rgba(6,182,212,0.3)',
@@ -289,7 +270,7 @@ export default function Landing() {
               }}
             >
               <div
-                className="absolute -top-3 right-6 rounded-full px-3 py-1 text-xs font-semibold text-white"
+                className="absolute -top-3 right-4 rounded-full px-3 py-1 text-xs font-semibold text-white md:right-6"
                 style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
               >
                 Most Popular
@@ -297,7 +278,7 @@ export default function Landing() {
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-cyan-400">
                 Premium
               </div>
-              <div className="mb-1 text-4xl font-bold text-white">$1</div>
+              <div className="mb-1 text-3xl font-bold text-white md:text-4xl">$1</div>
               <div className="mb-6 text-sm text-white/40">for 7 days, then $12/mo</div>
               <ul className="space-y-3">
                 {[
@@ -328,19 +309,17 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER CTA */}
-      <section className="relative px-6 py-24 text-center">
+      <section className="relative px-4 py-16 text-center md:px-6 md:py-24">
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-white md:text-4xl">
             Ready to understand yourself?
           </h2>
-          <p className="mb-8 text-white/50">
+          <p className="mb-8 text-white/50 text-sm md:text-base">
             Join thousands who have already found clarity with InnerGuide.
           </p>
           <button
             onClick={openSignup}
-            className="rounded-2xl px-10 py-4 text-base font-semibold text-white transition-all hover:scale-105 active:scale-95"
+            className="rounded-2xl px-8 py-3 text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95 md:px-10 md:py-4 md:text-base"
             style={{
               background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
               boxShadow: '0 0 40px rgba(6,182,212,0.3)',
@@ -350,12 +329,10 @@ export default function Landing() {
           </button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/5 px-6 py-8 text-center">
-        <div className="flex items-center justify-center gap-2 text-white/30">
+      <footer className="border-t border-white/5 px-4 py-6 text-center md:px-6 md:py-8">
+        <div className="flex items-center justify-center gap-2 text-white/30 text-xs md:text-sm">
           <span className="text-cyan-500">✦</span>
-          <span className="text-sm font-medium text-white/50">InnerGuide</span>
+          <span className="font-medium text-white/50">InnerGuide</span>
           <span className="text-xs">— Your AI mentor, always.</span>
         </div>
       </footer>
