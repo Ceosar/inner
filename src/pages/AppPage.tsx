@@ -196,7 +196,7 @@ export default function AppPage() {
     setIsTyping(true);
     try {
       const allMessages = [...messages, userMessage];
-      const responseText = await generateResponse(
+      const response = await generateResponse(
         mentors,
         activeMentorId,
         allMessages,
@@ -206,7 +206,12 @@ export default function AppPage() {
 
       const { data: insertedAI } = await supabase
         .from('messages')
-        .insert({ conversation_id: convId, role: 'assistant', content: responseText })
+        .insert({
+          conversation_id: convId,
+          role: 'assistant',
+          content: response.content,
+          reasoning_content: response.reasoning_content,
+        })
         .select()
         .single();
 

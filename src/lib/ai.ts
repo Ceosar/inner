@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { Message } from './supabase';
-import { getMentorById, Mentor } from './mentors';
+import { getMentorById, type Mentor } from './mentors';
 
 const SUGGESTIONS: Record<string, string[]> = {
   psychologist: [
@@ -51,7 +51,7 @@ export async function generateResponse(
   messages: Message[],
   customPrompt: string,
   deepMode: boolean,
-): Promise<string> {
+): Promise<{ content: string; reasoning_content: string }> {
   const mentor = getMentorById(mentors, mentorId);
   const basePrompt = mentor.base_prompt;
 
@@ -69,5 +69,8 @@ export async function generateResponse(
     throw new Error('Не удалось получить ответ от AI');
   }
 
-  return (data as any).content;
+  return {
+    content: (data as any).content || '',
+    reasoning_content: (data as any).reasoning_content || '',
+  };
 }

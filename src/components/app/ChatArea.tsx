@@ -111,9 +111,20 @@ function MessageBubble({ message, mentor }: { message: Message; mentor: Mentor }
         {mentor.icon}
       </div>
       <div className="max-w-2xl">
-        {/* <div className="mb-1 text-xs font-medium" style={{ color: mentor.glow_color }}>
-          {mentor.name}
-        </div> */}
+        {/* 👇 НОВОЕ: Сворачиваемый блок с размышлениями */}
+        {message.role === 'assistant' && message.reasoning_content && (
+          <details className="mb-2 cursor-pointer group">
+            <summary className="flex items-center gap-1.5 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors">
+              <span>🧠</span>
+              Show thinking process
+            </summary>
+            <div className="mt-2 rounded-lg bg-purple-900/20 p-3 text-xs text-purple-200 border border-purple-500/20 max-h-48 overflow-y-auto">
+              {message.reasoning_content}
+            </div>
+          </details>
+        )}
+
+        {/* Основное сообщение */}
         <div
           className="rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed text-white/85"
           style={{

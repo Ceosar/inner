@@ -20,6 +20,7 @@ export type Message = {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
+  reasoning_content?: string;
 };
 
 export type UserSettings = {
