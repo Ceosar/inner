@@ -13,6 +13,8 @@ type Props = {
 export default function ChatArea({ messages, mentor, loading, isTyping }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  console.log(messages);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);

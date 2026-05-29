@@ -87,15 +87,16 @@ export default function AppPage() {
   useEffect(() => {
     if (!user) return;
     supabase
-      .from('user_settings')
+      .from('profiles')
       .select('*')
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
+          console.log(data.role);
           setCustomPrompts((data.custom_prompts as Record<string, string>) ?? {});
           setDeepMode(data.deep_mode ?? false);
-          setRole(data.role);
+          setRole(data.role ?? 'user');
         }
       });
   }, [user]);
