@@ -11,13 +11,21 @@ type Props = {
 };
 
 export default function ChatArea({ messages, mentor, loading, isTyping }: Props) {
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  console.log(messages);
-
+  // Автопрокрутка только если пользователь уже внизу
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isNearBottom = scrollTop + clientHeight >= scrollHeight - 10; // допуск 10px
+
+    if (isNearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isTyping]); // срабатывает при любом изменении контента
 
   if (loading) {
     return (
@@ -48,7 +56,7 @@ export default function ChatArea({ messages, mentor, loading, isTyping }: Props)
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-6">
+    <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
       <div className="mx-auto max-w-2xl space-y-6">
         {messages.map((msg, i) => (
           <MessageBubble key={msg.id ?? i} message={msg} mentor={mentor} />
@@ -113,9 +121,8 @@ function MessageBubble({ message, mentor }: { message: Message; mentor: Mentor }
         {mentor.icon}
       </div>
       <div className="max-w-2xl">
-        {/* 👇 НОВОЕ: Сворачиваемый блок с размышлениями */}
         {message.role === 'assistant' && message.reasoning_content && (
-          <details className="mb-2 cursor-pointer group">
+          <details className="mb-2 cursor-pointer group" open={message.id.startsWith('streaming-')}>
             <summary className="flex items-center gap-1.5 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors">
               <span>🧠</span>
               Show thinking process

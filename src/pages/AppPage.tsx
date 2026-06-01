@@ -12,6 +12,19 @@ import ChatInput from '../components/app/ChatInput';
 import MentorSettingsPanel from '../components/app/MentorSettingsPanel';
 import AdminMentorPanel from '../components/app/AdminMentorPanel';
 
+// --- вспомогательные функции для симуляции печати ---
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function simulateTyping(text: string, onUpdate: (partial: string) => void, speedMs = 15) {
+  for (let i = 0; i < text.length; i++) {
+    onUpdate(text.slice(0, i + 1));
+    await sleep(speedMs);
+  }
+}
+// -------------------------------------------------
+
 export default function AppPage() {
   const { user, signOut } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -32,6 +45,7 @@ export default function AppPage() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileMentorsOpen, setMobileMentorsOpen] = useState(false);
 
+  // Загрузка менторов
   useEffect(() => {
     if (!user) {
       setLoadingMentors(false);
@@ -55,6 +69,7 @@ export default function AppPage() {
 
   const activeMentor = mentors.length > 0 ? getMentorById(mentors, activeMentorId) : null;
 
+  // Загрузка бесед
   useEffect(() => {
     if (!user) return;
     supabase
@@ -67,6 +82,7 @@ export default function AppPage() {
       });
   }, [user]);
 
+  // Загрузка сообщений
   useEffect(() => {
     if (!activeConvId) {
       setMessages([]);
@@ -84,19 +100,28 @@ export default function AppPage() {
       });
   }, [activeConvId]);
 
+  // Загрузка настроек пользователя: роль из profiles, остальное из user_settings
   useEffect(() => {
     if (!user) return;
+    // Роль из profiles
     supabase
       .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setRole(data.role ?? 'user');
+      });
+    // Настройки из user_settings
+    supabase
+      .from('user_settings')
       .select('*')
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
-          console.log(data.role);
           setCustomPrompts((data.custom_prompts as Record<string, string>) ?? {});
           setDeepMode(data.deep_mode ?? false);
-          setRole(data.role ?? 'user');
         }
       });
   }, [user]);
@@ -156,7 +181,9 @@ export default function AppPage() {
     setMessages([]);
   };
 
+  // ============== НОВАЯ ОТПРАВКА С ИМИТАЦИЕЙ ПЕЧАТИ ==============
   const handleSendMessage = async (content: string) => {
+    setIsTyping(true);
     if (!user || !activeMentor) return;
 
     let convId = activeConvId;
@@ -194,7 +221,6 @@ export default function AppPage() {
         .eq('id', convId);
     }
 
-    setIsTyping(true);
     try {
       const allMessages = [...messages, userMessage];
       const response = await generateResponse(
@@ -204,6 +230,43 @@ export default function AppPage() {
         customPrompts[activeMentorId] ?? '',
         deepMode,
       );
+
+      setIsTyping(false);
+
+      const tempId = 'streaming-' + crypto.randomUUID();
+      const tempMsg: Message = {
+        id: tempId,
+        conversation_id: convId,
+        role: 'assistant',
+        content: '',
+        reasoning_content: '',
+        created_at: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, tempMsg]);
+
+      const updateTemp = (updates: Partial<Pick<Message, 'content' | 'reasoning_content'>>) => {
+        setMessages(prev => prev.map(m => (m.id === tempId ? { ...m, ...updates } : m)));
+      };
+
+      if (response.reasoning_content) {
+        await simulateTyping(
+          response.reasoning_content,
+          partial => {
+            updateTemp({ reasoning_content: partial });
+          },
+          10,
+        );
+      }
+
+      if (response.content) {
+        await simulateTyping(
+          response.content,
+          partial => {
+            updateTemp({ content: partial });
+          },
+          20,
+        );
+      }
 
       const { data: insertedAI } = await supabase
         .from('messages')
@@ -216,11 +279,18 @@ export default function AppPage() {
         .select()
         .single();
 
-      if (insertedAI) setMessages(prev => [...prev, insertedAI as Message]);
+      if (insertedAI) {
+        setMessages(prev => prev.map(m => (m.id === tempId ? (insertedAI as Message) : m)));
+      }
+    } catch (err) {
+      console.error('AI generation error:', err);
+      setIsTyping(false);
+      setMessages(prev => prev.filter(m => !m.id.startsWith('streaming-')));
     } finally {
       setIsTyping(false);
     }
   };
+  // =============================================================
 
   const handleCustomPromptChange = async (prompt: string) => {
     const next = { ...customPrompts, [activeMentorId]: prompt };

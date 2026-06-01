@@ -21,7 +21,9 @@ export default function ChatInput({
 }: Props) {
   const [input, setInput] = useState('');
   const [isMicActive, setIsMicActive] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
   const suggestions = getSuggestions(mentorId);
 
   const adjustHeight = () => {
@@ -34,6 +36,53 @@ export default function ChatInput({
   useEffect(() => {
     adjustHeight();
   }, [input]);
+
+  // Инициализация SpeechRecognition
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'ru-RU';
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(prev => prev + (prev ? ' ' : '') + transcript);
+      setIsMicActive(false);
+      setIsListening(false);
+      textareaRef.current?.focus();
+    };
+
+    recognition.onerror = () => {
+      setIsMicActive(false);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsMicActive(false);
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const handleMicClick = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+
+    if (isListening) {
+      recognition.stop();
+      setIsMicActive(false);
+      setIsListening(false);
+    } else {
+      recognition.start();
+      setIsMicActive(true);
+      setIsListening(true);
+    }
+  };
 
   const handleSend = () => {
     const msg = input.trim();
@@ -119,7 +168,7 @@ export default function ChatInput({
                 adjustHeight();
               }}
               onKeyDown={handleKeyDown}
-              placeholder="Write what's on your mind..."
+              placeholder={isListening ? 'Говорите...' : "Write what's on your mind..."}
               disabled={disabled}
               rows={1}
               className="flex-1 resize-none bg-transparent text-sm text-white placeholder-white/30 outline-none"
@@ -127,12 +176,19 @@ export default function ChatInput({
             />
 
             <div className="flex shrink-0 items-center gap-1.5 mb-0.5">
+              {/* Голосовой ввод */}
               <button
-                onClick={() => setIsMicActive(!isMicActive)}
-                className="text-white/30 transition-colors hover:text-white/60"
+                onClick={handleMicClick}
+                className="text-white/30 transition-colors hover:text-white/60 relative"
                 style={{ color: isMicActive ? glowColor : undefined }}
               >
                 <Mic size={18} className={isMicActive ? 'animate-pulse' : ''} />
+                {isListening && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                )}
               </button>
 
               <button
